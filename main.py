@@ -9,7 +9,8 @@ from coletar_dados import coletar_moedas_comparativas
 
 
 import matplotlib
-matplotlib.use('Agg') #------- PARA AMBIENTES SEM GUI
+matplotlib.use('Agg')  # ------- PARA AMBIENTES SEM GUI
+
 
 def main():
     print("Coletando dados da API...")
@@ -29,7 +30,7 @@ def main():
     # ----- SALVAR CSV
     forecast_df.to_csv("output/previsao_usdbrl.csv", index=False)
 
-    # ----- GRAFICOS 
+    # ----- GRAFICOS
     plt.figure(figsize=(12, 6))
     plt.plot(df.index, df['venda'], label='Histórico', color='gray')
     plt.plot(df.index, df['media_movel_5d'],
@@ -58,22 +59,39 @@ def main():
     plt.tight_layout()
     plt.savefig("output/histograma_variacao.png")
 
-
     # ---- Dólar x Euro x Bitcoin
-    print("Gerando gráfico comparativo com Euro e Bitcoin...")
     comparativos = coletar_moedas_comparativas()
     df_eur = comparativos["EUR"]
     df_btc = comparativos["BTC"]
 
-    plt.figure(figsize=(12, 6))
-    plt.plot(df.index, df['venda'], label="USD/BRL", color='blue')
-    plt.plot(df_eur.index, df_eur['EUR'], label="EUR/BRL", color='green')
-    plt.plot(df_btc.index, df_btc['BTC'], label="BTC/BRL", color='orange')
+    df_eur['EUR'] = pd.to_numeric(df_eur['EUR'], errors='coerce')
+    df_btc['BTC'] = pd.to_numeric(df_btc['BTC'], errors='coerce')
+
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # ------- (USD e EUR)
+    ax1.plot(df.index, df['venda'], label="USD/BRL", color='blue')
+    ax1.plot(df_eur.index, df_eur['EUR'], label="EUR/BRL", color='green')
+    ax1.set_ylabel("USD/EUR (R$)", color='blue')
+    ax1.tick_params(axis='y', labelcolor='blue')
+    ax1.set_ylim(df['venda'].min() * 0.98, df_eur['EUR'].max()
+                 * 1.02)  
+    ax1.yaxis.set_major_locator(plt.MaxNLocator(8))
+
+    # ------ (BTC)
+    ax2 = ax1.twinx()
+    ax2.plot(df_btc.index, df_btc['BTC'], label="BTC/BRL", color='orange')
+    ax2.set_ylabel("BTC (R$)", color='orange')
+    ax2.tick_params(axis='y', labelcolor='orange')
+    ax2.set_ylim(df_btc['BTC'].min() * 0.95, df_btc['BTC'].max() * 1.05)
+    ax2.yaxis.set_major_locator(plt.MaxNLocator(8))
+
     plt.title("Comparativo: USD vs EUR vs BTC (cotação em BRL)")
-    plt.xlabel("Data")
-    plt.ylabel("Cotação (R$)")
-    plt.legend()
-    plt.tight_layout()
+    lines_1, labels_1 = ax1.get_legend_handles_labels()
+    lines_2, labels_2 = ax2.get_legend_handles_labels()
+    fig.legend(lines_1 + lines_2, labels_1 + labels_2, loc="lower right")
+
+    fig.tight_layout()
     plt.savefig("output/grafico_comparativo_ativos.png")
 
     # ----- RELATÓRIO
