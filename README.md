@@ -44,22 +44,37 @@ O modelo é salvo localmente após o primeiro treino e **reutilizado nas execuç
 ## Estrutura de pastas
 
 previsao_dolar/
+
 ├── output/ # Arquivos gerados (gráficos, modelo, CSV)
+
 │ ├── grafico_previsao.png
+
 │ ├── grafico_previsao_completo.png
+
 │ ├── grafico_comparativo_ativos.png
+
 │ ├── histograma_variacao.png
+
 │ ├── previsao_usdbrl.csv
+
 │ └── modelo_usd.pkl # Modelo salvo (memória do sistema)
+
 │
 ├── relatorios/ # Relatórios finais em PDF
+
 │
 ├── coletar_dados.py
+
 ├── transformar_dados.py
+
 ├── modelar_previsao.py
+
 ├── relatorio.py
+
 ├── main.py # Executa o pipeline completo
+
 ├── requirements.txt
+
 ├── README.md
 
 ## Exemplos de saída
@@ -87,3 +102,4 @@ previsao_dolar/
 
    pip install -r requirements.txt
    python main.py
+
